@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>JACOB GAPP SCHOOL, PALADUGU - Telugu Acchulu Practice (Set 2)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@500;700;900&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0; padding: 0;
+      width: 100%; height: 100dvh;
+      overflow: hidden;
+      font-family: 'Fredoka', 'Noto Sans Telugu', sans-serif;
+      background: linear-gradient(135deg, #fef08a 0%, #bae6fd 50%, #fbcfe8 100%);
+    }
+    .telugu-font { font-family: 'Noto Sans Telugu', sans-serif; }
+    
+    /* Custom Scrollbar for inner workspace if needed on tiny screens */
+    .workspace-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+    .workspace-scroll::-webkit-scrollbar-thumb { background: #ec4899; border-radius: 10px; }
+
+    /* Pulsing Medium Speaker Button */
+    .speaker-btn {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(255, 65, 108, 0.45);
+      border: 2.5px solid #fff;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      flex-shrink: 0;
+    }
+    .speaker-btn:active { transform: scale(0.88); }
+    .speaker-speaking { animation: pulseSpeaker 0.7s infinite alternate; }
+    @keyframes pulseSpeaker {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 65, 108, 0.7); }
+      100% { transform: scale(1.14); box-shadow: 0 0 0 10px rgba(255, 65, 108, 0); }
+    }
+
+    /* Card Animations */
+    .word-card {
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: 3px solid #fff;
+    }
+    .word-card:hover { transform: translateY(-3px); }
+    .word-card:active { transform: scale(0.97); }
+
+    /* Memory Card Flip */
+    .mem-card {
+      perspective: 800px;
+      cursor: pointer;
+    }
+    .mem-inner {
+      position: relative;
+      width: 100%; height: 100%;
+      text-align: center;
+      transition: transform 0.45s;
+      transform-style: preserve-3d;
+    }
+    .mem-card.flipped .mem-inner, .mem-card.matched .mem-inner {
+      transform: rotateY(180deg);
+    }
+    .mem-front, .mem-back {
+      position: absolute;
+      width: 100%; height: 100%;
+      backface-visibility: hidden;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+    }
+    .mem-front {
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      color: white;
+    }
+    .mem-back {
+      background: #ffffff;
+      transform: rotateY(180deg);
+    }
+    .mem-card.matched .mem-back {
+      background: #dcfce7;
+      border-color: #22c55e;
+    }
+
+    @media print {
+      .no-print { display: none !important; }
+      body { overflow: visible !important; height: auto !important; background: #fff !important; }
+    }
+  </style>
+</head>
+<body class="flex flex-col justify-between">
+
+  <!-- 1. SINGLE-LINE ULTRA-COMPACT TOP BANNER -->
+  <header class="no-print w-full bg-gradient-to-r from-indigo-900 via-purple-800 to-pink-700 text-white px-2 py-1.5 shadow-md flex items-center justify-between gap-1 shrink-0 z-20 border-b-2 border-yellow-300">
+    <!-- Single Line School Title + Author -->
+    <div class="flex items-center gap-1.5 overflow-hidden whitespace-nowrap">
+      <span class="bg-yellow-400 text-indigo-950 font-black px-2 py-0.5 rounded-full text-xs sm:text-sm shadow">🏫 SET-2</span>
+      <h1 class="font-extrabold text-xs sm:text-base md:text-lg tracking-wide truncate text-yellow-300 drop-shadow">
+        JACOB GAPP SCHOOL, PALADUGU <span class="text-white font-semibold text-[11px] sm:text-sm">— by Bro. Balaswamy</span>
+      </h1>
+    </div>
+
+    <!-- Live 60-Min Timer, Score & Loud Audio Control -->
+    <div class="flex items-center gap-1.5 shrink-0">
+      <div class="bg-black/40 border border-yellow-400/60 px-2 py-0.5 rounded-lg flex items-center gap-1 text-xs sm:text-sm font-bold" title="60 Minutes Screen Practice">
+        <i class="fa-solid fa-clock text-yellow-300 animate-spin" style="animation-duration:8s;"></i>
+        <span id="timerDisplay" class="text-yellow-200 font-mono">00:00</span>
+        <span class="hidden md:inline text-[10px] text-gray-300">/60m</span>
+      </div>
+
+      <div class="bg-yellow-400 text-indigo-950 px-2 py-0.5 rounded-lg font-black text-xs sm:text-sm flex items-center gap-1 shadow">
+        <i class="fa-solid fa-star text-orange-600"></i>
+        <span id="scoreDisplay">0</span>
+      </div>
+
+      <button onclick="toggleLoudBoost()" id="boostBtn" class="bg-green-500 hover:bg-green-600 text-white font-bold px-2 py-1 rounded-lg text-xs flex items-center gap-1 border border-white shadow active:scale-95" title="Loud Audio Booster">
+        <i class="fa-solid fa-volume-high"></i>
+        <span class="hidden sm:inline" id="boostLabel">LOUD</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 2. COMPACT NAVIGATION TABS (ALL 5 MODES VISIBLE AT ONCE) -->
+  <nav class="no-print w-full bg-white/90 backdrop-blur px-1.5 py-1 shadow-sm flex items-center justify-around gap-1 shrink-0 border-b border-purple-200 z-10">
+    <button onclick="switchMode('learn')" id="tab-learn" class="mode-tab flex-1 py-1 px-1 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1 bg-pink-600 text-white shadow">
+      <span>📖</span> <span class="truncate">1. అచ్చులు-పదాలు</span>
+    </button>
+    <button onclick="switchMode('memory')" id="tab-memory" class="mode-tab flex-1 py-1 px-1 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1 bg-purple-100 text-purple-900">
+      <span>🧠</span> <span class="truncate">2. మెమరీ గేమ్</span>
+    </button>
+    <button onclick="switchMode('match')" id="tab-match" class="mode-tab flex-1 py-1 px-1 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1 bg-purple-100 text-purple-900">
+      <span>🔗</span> <span class="truncate">3. జతపరచండి</span>
+    </button>
+    <button onclick="switchMode('quiz')" id="tab-quiz" class="mode-tab flex-1 py-1 px-1 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1 bg-purple-100 text-purple-900">
+      <span>🎯</span> <span class="truncate">4. సరైన పదం</span>
+    </button>
+    <button onclick="switchMode('report')" id="tab-report" class="mode-tab flex-1 py-1 px-1 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1 bg-purple-100 text-purple-900">
+      <span>🏆</span> <span class="truncate">5. ప్రోగ్రెస్</span>
+    </button>
+  </nav>
+
+  <!-- 3. FULL-SCREEN WORKSPACE (FITS REMAINING HEIGHT WITHOUT CUTOFF) -->
+  <main class="flex-1 w-full max-w-6xl mx-auto p-1.5 sm:p-2 overflow-hidden flex flex-col">
+
+    <!-- ==================== MODE 1: LEARN NEW ACCHULU WORDS ==================== -->
+    <section id="mode-learn" class="flex-1 flex flex-col justify-between overflow-hidden gap-1.5">
+      
+      <!-- 16 Vowels Quick Selector Bar -->
+      <div class="bg-white/90 rounded-2xl p-1.5 shadow flex items-center justify-between gap-1 shrink-0 border border-pink-200">
+        <button onclick="prevVowel()" class="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center shadow active:scale-90 shrink-0">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div id="vowelPills" class="flex items-center gap-1 overflow-x-auto workspace-scroll py-0.5 px-1">
+          <!-- Vowel Buttons Rendered by JS -->
+        </div>
+
+        <button onclick="nextVowel()" class="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center shadow active:scale-90 shrink-0">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <!-- Active Vowel Hero Header -->
+      <div class="bg-gradient-to-r from-pink-500 via-rose-500 to-orange-500 text-white rounded-2xl px-3 py-1.5 shadow-md flex items-center justify-between shrink-0 border-2 border-white">
+        <div class="flex items-center gap-2.5">
+          <div id="activeVowelBadge" onclick="speakCurrentVowel()" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-yellow-300 text-indigo-950 font-black text-3xl sm:text-4xl flex items-center justify-center shadow-lg border-2 border-white cursor-pointer active:scale-90 telugu-font">
+            అ
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span id="activeVowelTitle" class="font-black text-base sm:text-xl telugu-font">అ - కొత్త పదాలు (New Words)</span>
+              <span id="activeVowelPhonetic" class="bg-white/25 px-2 py-0.5 rounded-full text-xs font-bold">'a' sound</span>
+            </div>
+            <p class="text-[11px] sm:text-xs text-yellow-100">🔊 బొమ్మ లేదా స్పీకర్ నొక్కి స్పష్టంగా పలకండి (Tap Speaker to Listen & Repeat)</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="speakAllThreeWords()" class="bg-yellow-300 hover:bg-yellow-400 text-indigo-950 font-extrabold px-2.5 py-1.5 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-md border border-white active:scale-95">
+            <i class="fa-solid fa-volume-high text-red-600"></i>
+            <span>అన్నీ వినండి</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3 Big Word Cards Grid (Fits 100% in Remaining Screen Space) -->
+      <div id="learnCardsGrid" class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2 overflow-y-auto workspace-scroll p-0.5">
+        <!-- Populated by JS -->
+      </div>
+
+    </section>
+
+    <!-- ==================== MODE 2: MEMORY FLIP GAME ==================== -->
+    <section id="mode-memory" class="hidden flex-1 flex flex-col justify-between overflow-hidden gap-1.5">
+      <div class="bg-white/95 rounded-2xl px-3 py-1.5 shadow flex flex-wrap items-center justify-between gap-2 shrink-0 border border-purple-200">
+        <div class="flex items-center gap-2">
+          <span class="text-lg sm:text-xl">🧠</span>
+          <div>
+            <h2 class="font-extrabold text-purple-900 text-xs sm:text-base telugu-font">మెమరీ గేమ్ (Match Vowel & Picture Word)</h2>
+            <p class="text-[11px] text-gray-600">కార్డు తిప్పినప్పుడు శబ్దం విని జత చేయండి! (Listen & Match Pairs)</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1.5">
+          <span class="bg-purple-100 text-purple-900 px-2.5 py-1 rounded-lg text-xs font-bold">
+            జతలు (Pairs): <span id="memPairsCount">0/6</span>
+          </span>
+          <button onclick="initMemoryGame(6)" class="bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow active:scale-95">Easy (6)</button>
+          <button onclick="initMemoryGame(12)" class="bg-indigo-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow active:scale-95">Medium (12)</button>
+          <button onclick="initMemoryGame(16)" class="bg-pink-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow active:scale-95">Hard (16)</button>
+        </div>
+      </div>
+
+      <div id="memoryBoard" class="flex-1 grid grid-cols-3 sm:grid-cols-4 gap-2 p-1 overflow-hidden">
+        <!-- Memory Cards Injected Here -->
+      </div>
+    </section>
+
+    <!-- ==================== MODE 3: MATCH THE FOLLOWING ==================== -->
+    <section id="mode-match" class="hidden flex-1 flex flex-col justify-between overflow-hidden gap-1.5">
+      <div class="bg-white/95 rounded-2xl px-3 py-1.5 shadow flex items-center justify-between gap-2 shrink-0 border border-blue-200">
+        <div>
+          <h2 class="font-extrabold text-blue-900 text-xs sm:text-base telugu-font">🔗 జతపరచండి (Tap Left Item, Then Tap Right Match)</h2>
+          <p class="text-[11px] text-gray-600">ఎడమవైపు అచ్చు/బొమ్మను తాకి, కుడివైపు సరైన పదంతో జత చేయండి.</p>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="bg-blue-100 text-blue-900 font-bold px-2.5 py-1 rounded-lg text-xs">Round: <span id="matchRoundNum">1</span></span>
+          <button onclick="initMatchGame()" class="bg-blue-600 text-white font-bold px-3 py-1 rounded-xl text-xs shadow flex items-center gap-1 active:scale-95">
+            <i class="fa-solid fa-rotate"></i> కొత్త గేమ్
+          </button>
+        </div>
+      </div>
+
+      <!-- Matching Columns Area -->
+      <div class="flex-1 grid grid-cols-2 gap-2.5 sm:gap-4 overflow-hidden py-0.5">
+        <div id="matchLeftCol" class="flex flex-col justify-between gap-1.5"></div>
+        <div id="matchRightCol" class="flex flex-col justify-between gap-1.5"></div>
+      </div>
+    </section>
+
+    <!-- ==================== MODE 4: CHOOSE THE CORRECT WORD QUIZ ==================== -->
+    <section id="mode-quiz" class="hidden flex-1 flex flex-col justify-between overflow-hidden gap-2">
+      <!-- Top Quiz Status Bar -->
+      <div class="bg-white/95 rounded-2xl px-3 py-1.5 shadow flex items-center justify-between shrink-0 border border-orange-200">
+        <div class="flex items-center gap-2">
+          <span class="bg-orange-500 text-white font-black px-2.5 py-0.5 rounded-lg text-xs">Q. <span id="quizQNum">1</span></span>
+          <span class="font-extrabold text-xs sm:text-sm text-gray-800 telugu-font">చిత్రం చూసి, శబ్దం విని సరైన పదం ఎంచుకోండి!</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-lg text-xs">🔥 Streak: <span id="quizStreak">0</span></span>
+          <button onclick="speakQuizPrompt()" class="speaker-btn !w-9 !h-9" title="Listen Question Word">
+            <i class="fa-solid fa-volume-high text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quiz Prompt Card + 4 Options Fitting Screen -->
+      <div class="flex-1 grid grid-cols-1 md:grid-cols-12 gap-2 overflow-hidden">
+        <!-- Left/Top: Big Picture & Audio Prompt -->
+        <div class="md:col-span-5 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white rounded-2xl p-3 shadow-lg flex flex-col items-center justify-center relative border-2 border-white">
+          <span id="quizVowelHint" class="absolute top-2 left-2 bg-yellow-300 text-indigo-950 font-black px-3 py-0.5 rounded-full text-sm sm:text-base telugu-font shadow">అ</span>
+          
+          <button onclick="speakQuizPrompt()" class="speaker-btn absolute top-2 right-2" title="Speak Loudly">
+            <i class="fa-solid fa-volume-high text-lg"></i>
+          </button>
+
+          <div id="quizEmoji" onclick="speakQuizPrompt()" class="text-6xl sm:text-7xl md:text-8xl mb-2 cursor-pointer transition hover:scale-110 drop-shadow-md">🦚</div>
+          <div id="quizEngHint" class="bg-black/30 px-3 py-1 rounded-full text-xs sm:text-sm font-bold text-yellow-200 tracking-wide">Peacock</div>
+          <p class="text-[11px] text-white/90 mt-1">🔊 స్పీకర్ నొక్కి పదం వినండి</p>
+        </div>
+
+        <!-- Right/Bottom: 2x2 Options Grid with Individual Medium Speakers -->
+        <div id="quizOptionsGrid" class="md:col-span-7 grid grid-cols-2 gap-2">
+          <!-- Options generated by JS -->
+        </div>
+      </div>
+
+      <!-- Instant Feedback Bar -->
+      <div id="quizFeedbackBar" class="bg-white/90 rounded-xl px-3 py-1.5 text-center font-extrabold text-xs sm:text-sm text-indigo-900 shadow shrink-0 border border-indigo-100">
+        👆 సరైన తెలుగు పదాన్ని తాకండి (Tap the correct Telugu word above)
+      </div>
+    </section>
+
+    <!-- ==================== MODE 5: HOW WELL THEY HAVE DONE (REPORT) ==================== -->
+    <section id="mode-report" class="hidden flex-1 flex flex-col justify-between overflow-y-auto workspace-scroll gap-2 p-1">
+      <div class="bg-white rounded-2xl p-3 shadow-lg border-2 border-yellow-400 flex flex-col gap-2">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-2">
+          <div>
+            <h2 class="font-black text-sm sm:text-lg text-indigo-950">🏆 JACOB GAPP SCHOOL, PALADUGU — Practice Report (Set 2)</h2>
+            <p class="text-xs text-gray-600">Class 1 Standard • Basic Acchulu Telugu Words • Prepared by Bro. Balaswamy</p>
+          </div>
+          <div class="flex items-center gap-1.5 no-print">
+            <input id="studentNameInput" type="text" placeholder="విద్యార్థి పేరు (Student Name)" oninput="saveStudentName(this.value)" class="border-2 border-indigo-300 rounded-xl px-2.5 py-1 text-xs sm:text-sm font-bold focus:outline-none focus:border-pink-500" />
+            <button onclick="window.print()" class="bg-indigo-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 shadow">
+              <i class="fa-solid fa-print"></i> Print
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Summary Metrics -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+          <div class="bg-indigo-50 p-2 rounded-xl border border-indigo-200">
+            <div class="text-[11px] font-bold text-indigo-600">PRACTICE TIME</div>
+            <div id="repTime" class="text-lg sm:text-2xl font-black text-indigo-950">00:00</div>
+            <div id="repGoalPct" class="text-[10px] text-gray-600">Goal: 60 Mins</div>
+          </div>
+          <div class="bg-pink-50 p-2 rounded-xl border border-pink-200">
+            <div class="text-[11px] font-bold text-pink-600">WORDS PRACTICED</div>
+            <div id="repWordsCount" class="text-lg sm:text-2xl font-black text-pink-950">0 / 48</div>
+            <div class="text-[10px] text-gray-600">Audio Listened</div>
+          </div>
+          <div class="bg-emerald-50 p-2 rounded-xl border border-emerald-200">
+            <div class="text-[11px] font-bold text-emerald-600">QUIZ ACCURACY</div>
+            <div id="repAccuracy" class="text-lg sm:text-2xl font-black text-emerald-950">100%</div>
+            <div id="repQuizDetail" class="text-[10px] text-gray-600">0 Correct / 0 Tried</div>
+          </div>
+          <div class="bg-amber-50 p-2 rounded-xl border border-amber-200">
+            <div class="text-[11px] font-bold text-amber-700">GAMES & STARS</div>
+            <div id="repStars" class="text-lg sm:text-2xl font-black text-amber-900">⭐ 0</div>
+            <div id="repGamesWon" class="text-[10px] text-gray-600">0 Games Completed</div>
+          </div>
+        </div>
+
+        <!-- Overall Grade Badge -->
+        <div class="bg-gradient-to-r from-purple-700 via-indigo-700 to-blue-700 text-white rounded-xl p-2.5 flex items-center justify-between">
+          <div>
+            <div class="text-xs text-yellow-300 font-bold">OVERALL PERFORMANCE REMARK:</div>
+            <div id="repGradeTitle" class="text-sm sm:text-lg font-black telugu-font">🌟 అద్భుతంగా నేర్చుకుంటున్నారు! (Keep Practicing!)</div>
+          </div>
+          <button onclick="speakReportSummary()" class="speaker-btn no-print" title="Listen Report">
+            <i class="fa-solid fa-volume-high"></i>
+          </button>
+        </div>
+
+        <!-- Vowel-by-Vowel Mastery Matrix (16 Acchulu) -->
+        <div>
+          <h3 class="font-bold text-xs text-gray-700 mb-1">📊 అచ్చుల వారీగా ప్రోగ్రెస్ (Vowel-by-Vowel Mastery Matrix):</h3>
+          <div id="vowelMasteryGrid" class="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 4. COMPACT FOOTER PROGRESS BAR (60-MIN GOAL) -->
+  <footer class="no-print w-full bg-indigo-950 text-white px-2.5 py-1 flex items-center justify-between gap-2 text-[11px] shrink-0">
+    <div class="flex items-center gap-1.5 truncate">
+      <span class="text-yellow-400 font-bold">1-Hour Progress:</span>
+      <div class="w-24 sm:w-44 h-2.5 bg-indigo-800 rounded-full overflow-hidden border border-indigo-400">
+        <div id="hourProgressBar" class="h-full bg-gradient-to-r from-green-400 to-yellow-300 transition-all duration-500" style="width: 1%;"></div>
+      </div>
+      <span id="wordsHeardFooter" class="text-pink-300 font-bold">0/48 Words Heard</span>
+    </div>
+    <div class="text-gray-300 font-semibold truncate">
+      Class 1 Telugu • <span class="text-yellow-300">Bro. Balaswamy</span>
+    </div>
+  </footer>
+
+  <script>
+    /*************************************************************************
+     * EDITION 2: 48 BRAND-NEW ACCHULU WORDS FOR CLASS 1 CHILDREN
+     * Completely fresh vocabulary from Edition 1 (3 words per 16 Acchulu)
+     *************************************************************************/
+    const ACCHULU_SET_2 = [
+      {
+        vowel: "అ", sound: "a",
+        words: [
+          { te: "అరటి", en: "Banana", pron: "arati", emoji: "🍌", sentence: "అరటి పండు తియ్యగా ఉంటుంది" },
+          { te: "అద్దం", en: "Mirror", pron: "addam", emoji: "🪞", sentence: "అద్దంలో ముఖం చూసుకుంటాము" },
+          { te: "అల", en: "Ocean Wave", pron: "ala", emoji: "🌊", sentence: "సముద్రం అలలు ఎత్తుగా వస్తాయి" }
+        ]
+      },
+      {
+        vowel: "ఆ", sound: "aa",
+        words: [
+          { te: "ఆకు", en: "Green Leaf", pron: "aaku", emoji: "🍃", sentence: "చెట్టు ఆకు పచ్చగా ఉంటుంది" },
+          { te: "ఆట", en: "Play / Game", pron: "aata", emoji: "⚽", sentence: "పిల్లలు బంతి ఆట ఆడుతున్నారు" },
+          { te: "ఆకాశం", en: "Blue Sky", pron: "aakaasham", emoji: "🌤️", sentence: "ఆకాశంలో మబ్బులు ఉన్నాయి" }
+        ]
+      },
+      {
+        vowel: "ఇ", sound: "i",
+        words: [
+          { te: "ఇసుక", en: "Sand", pron: "isuka", emoji: "🏖️", sentence: "పిల్లలు ఇసుకతో గూడు కట్టారు" },
+          { te: "ఇనుము", en: "Iron / Hammer", pron: "inumu", emoji: "🔨", sentence: "ఇనుము చాలా గట్టిగా ఉంటుంది" },
+          { te: "ఇరుసు", en: "Wheel Axle", pron: "irusu", emoji: "⚙️", sentence: "బండి చక్రానికి ఇరుసు ఉంటుంది" }
+        ]
+      },
+      {
+        vowel: "ఈ", sound: "ee",
+        words: [
+          { te: "ఈత", en: "Swimming", pron: "eetha", emoji: "🏊", sentence: "నీటిలో ఈత కొట్టడం మంచి వ్యాయామం" },
+          { te: "ఈల", en: "Whistle", pron: "eela", emoji: "🪈", sentence: "ఆటలో ఈల గట్టిగా ఊదుతారు" },
+          { te: "ఈతచెట్టు", en: "Date Palm Tree", pron: "eethachettu", emoji: "🌴", sentence: "ఈతచెట్టు పొడవుగా పెరుగుతుంది" }
+        ]
+      },
+      {
+        vowel: "ఉ", sound: "u",
+        words: [
+          { te: "ఉంగరం", en: "Finger Ring", pron: "ungaram", emoji: "💍", sentence: "బంగారు ఉంగరం మెరుస్తోంది" },
+          { te: "ఉల్లిపాయ", en: "Onion", pron: "ullipaaya", emoji: "🧅", sentence: "కూరలో ఉల్లిపాయ వేస్తారు" },
+          { te: "ఉప్పు", en: "Salt", pron: "uppu", emoji: "🧂", sentence: "ఉప్పు వంటకు రుచిని ఇస్తుంది" }
+        ]
+      },
+      {
+        vowel: "ఊ", sound: "oo",
+        words: [
+          { te: "ఊరు", en: "Village", pron: "ooru", emoji: "🏡", sentence: "మా ఊరు పచ్చగా అందంగా ఉంటుంది" },
+          { te: "ఊపిరి", en: "Breathing", pron: "oopiri", emoji: "🌬️", sentence: "స్వచ్ఛమైన గాలి ఊపిరి పీల్చాలి" },
+          { te: "ఊలు", en: "Wool Yarn", pron: "oolu", emoji: "🧶", sentence: "ఊలుతో చలికోటు అల్లుతారు" }
+        ]
+      },
+      {
+        vowel: "ఋ", sound: "ru",
+        words: [
+          { te: "ఋతువు", en: "Season", pron: "ruthuvu", emoji: "🌦️", sentence: "వర్ష ఋతువులో వానలు పడతాయి" },
+          { te: "ఋషభం", en: "Strong Bull", pron: "rushabham", emoji: "🐂", sentence: "ఋషభం పొలంలో పని చేస్తుంది" },
+          { te: "ఋజువు", en: "Truth / Proof", pron: "rujuvu", emoji: "📜", sentence: "ఎప్పుడూ నిజం ఋజువు చేయాలి" }
+        ]
+      },
+      {
+        vowel: "ౠ", sound: "roo",
+        words: [
+          { te: "ౠక", en: "Gold Coin", pron: "rooka", emoji: "🪙", sentence: "పాతకాలం నాణేన్ని ౠక అంటారు" },
+          { te: "ౠకారము", en: "Letter Roo", pron: "rookaaramu", emoji: "🔤", sentence: "అచ్చులలో ఇది ౠకారము అక్షరం" },
+          { te: "ౠణము", en: "Gratitude", pron: "roonamu", emoji: "🙏", sentence: "తల్లిదండ్రుల ౠణము తీర్చుకోవాలి" }
+        ]
+      },
+      {
+        vowel: "ఎ", sound: "e",
+        words: [
+          { te: "ఎలుగుబంటి", en: "Bear", pron: "elugubanti", emoji: "🐻", sentence: "ఎలుగుబంటికి తేనె అంటే ఇష్టం" },
+          { te: "ఎముక", en: "Bone", pron: "emuka", emoji: "🦴", sentence: "పాలు తాగితే ఎముకలు బలంగా ఉంటాయి" },
+          { te: "ఎండ", en: "Sunshine", pron: "enda", emoji: "☀️", sentence: "పగలు సూర్యుని ఎండ కాస్తుంది" }
+        ]
+      },
+      {
+        vowel: "ఏ", sound: "ae",
+        words: [
+          { te: "ఏరు", en: "River Stream", pron: "aeru", emoji: "🏞️", sentence: "కొండల నుండి ఏరు ప్రవహిస్తోంది" },
+          { te: "ఏడు", en: "Number Seven", pron: "aedu", emoji: "7️⃣", sentence: "వారానికి ఏడు రోజులు ఉంటాయి" },
+          { te: "ఏలక్కాయ", en: "Cardamom", pron: "aelakkaaya", emoji: "🌱", sentence: "ఏలక్కాయ మంచి సువాసన ఇస్తుంది" }
+        ]
+      },
+      {
+        vowel: "ఐ", sound: "ai",
+        words: [
+          { te: "ఐదు", en: "Number Five", pron: "aidu", emoji: "🖐️", sentence: "చేతికి ఐదు వేళ్ళు ఉంటాయి" },
+          { te: "ఐకమత్యం", en: "Unity", pron: "aikamathyam", emoji: "🤝", sentence: "పిల్లలు ఐకమత్యంగా కలిసి ఉండాలి" },
+          { te: "ఐశ్వర్యం", en: "Treasure", pron: "aishwaryam", emoji: "💎", sentence: "చదువే మనకు నిజమైన ఐశ్వర్యం" }
+        ]
+      },
+      {
+        vowel: "ఒ", sound: "o",
+        words: [
+          { te: "ఒకటి", en: "Number One", pron: "okati", emoji: "1️⃣", sentence: "అంకెలలో మొదటిది ఒకటి" },
+          { te: "ఒడ్డు", en: "River Bank", pron: "oddu", emoji: "🏝️", sentence: "నది ఒడ్డున చెట్లు ఉన్నాయి" },
+          { te: "ఒడి", en: "Mother's Lap", pron: "odi", emoji: "👩‍👧", sentence: "అమ్మ ఒడిలో పాపాయి నిద్రపోయింది" }
+        ]
+      },
+      {
+        vowel: "ఓ", sound: "oo",
+        words: [
+          { te: "ఓపిక", en: "Patience", pron: "oopika", emoji: "🧘", sentence: "ఓపికతో చదివితే అన్నీ వస్తాయి" },
+          { te: "ఓటు", en: "Vote", pron: "ootu", emoji: "🗳️", sentence: "పెద్దలు ఓటు హక్కు వినియోగిస్తారు" },
+          { te: "ఓంకారం", en: "Om Symbol", pron: "oonkaaram", emoji: "🕉️", sentence: "ఓంకారం ప్రశాంతతను ఇస్తుంది" }
+        ]
+      },
+      {
+        vowel: "ఔ", sound: "au",
+        words: [
+          { te: "ఔషధం", en: "Herbal Medicine", pron: "aushadham", emoji: "🌿", sentence: "తులసి ఆకు మంచి ఔషధం" },
+          { te: "ఔదార్యం", en: "Kindness / Sharing", pron: "audaryam", emoji: "🎁", sentence: "ఇతరులకు సహాయం చేయడం ఔదార్యం" },
+          { te: "ఔను", en: "Yes / Thumbs Up", pron: "aunu", emoji: "👍", sentence: "మంచి పనికి ఎప్పుడూ ఔను అనాలి" }
+        ]
+      },
+      {
+        vowel: "అం", sound: "am",
+        words: [
+          { te: "అందం", en: "Beauty / Flower", pron: "andam", emoji: "🌺", sentence: "పువ్వులు తోటకు అందం తెస్తాయి" },
+          { te: "అంకెలు", en: "Numbers", pron: "ankelu", emoji: "🔢", sentence: "మనం తెలుగు అంకెలు నేర్చుకుందాం" },
+          { te: "అంబలి", en: "Healthy Porridge", pron: "ambali", emoji: "🥣", sentence: "రాగి అంబలి ఆరోగ్యానికి మంచిది" }
+        ]
+      },
+      {
+        vowel: "అః", sound: "aha",
+        words: [
+          { te: "అంతఃపురం", en: "Royal Palace", pron: "anthahpuram", emoji: "🏰", sentence: "రాజుగారి అంతఃపురం పెద్దగా ఉంటుంది" },
+          { te: "దుఃఖం", en: "Sadness", pron: "duhkham", emoji: "😢", sentence: "ఎవరికీ దుఃఖం కలిగించకూడదు" },
+          { te: "పునః", en: "Repeat Again", pron: "punaha", emoji: "🔁", sentence: "పాఠాన్ని పునః చదవడం మంచిది" }
+        ]
+      }
+    ];
+
+    // Flatten all 48 words for games & tracking
+    const ALL_WORDS = [];
+    ACCHULU_SET_2.forEach((group, vIdx) => {
+      group.words.forEach((w, wIdx) => {
+        ALL_WORDS.push({ ...w, vowel: group.vowel, vIdx, id: `${vIdx}-${wIdx}` });
+      });
+    });
+
+    // App State & Persistence
+    let state = {
+      currentVowelIdx: 0,
+      secondsElapsed: 0,
+      score: 0,
+      loudBoost: true,
+      studentName: "",
+      wordsHeard: {},      // id -> count
+      vowelMastery: {},    // vowel -> points
+      quizCorrect: 0,
+      quizTotal: 0,
+      quizStreak: 0,
+      gamesCompleted: 0,
+      matchRound: 1
+    };
+
+    // Load saved progress from LocalStorage
+    const SAVED_KEY = "JGS_PALADUGU_ACCHULU_SET2_STATE";
+    try {
+      const saved = JSON.parse(localStorage.getItem(SAVED_KEY));
+      if (saved) state = { ...state, ...saved };
+    } catch (e) {}
+
+    function saveState() {
+      try { localStorage.setItem(SAVED_KEY, JSON.stringify(state)); } catch (e) {}
+      updateHeaderHUD();
+    }
+
+    /*************************************************************************
+     * LOUD WEB AUDIO + TELUGU SPEECH SYNTHESIS ENGINE
+     *************************************************************************/
+    let audioCtx = null;
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playChime(type = "tap") {
+      try {
+        const ctx = getAudioCtx();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const vol = state.loudBoost ? 0.35 : 0.15;
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === "tap") {
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(620, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+          gain.gain.setValueAtTime(vol, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+          osc.start(now); osc.stop(now + 0.13);
+        } else if (type === "success") {
+          [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.type = "triangle";
+            o.frequency.setValueAtTime(freq, now + idx * 0.08);
+            g.gain.setValueAtTime(vol, now + idx * 0.08);
+            g.gain.linearRampToValueAtTime(0.01, now + idx * 0.08 + 0.18);
+            o.connect(g); g.connect(ctx.destination);
+            o.start(now + idx * 0.08); o.stop(now + idx * 0.08 + 0.19);
+          });
+        } else if (type === "wrong") {
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.linearRampToValueAtTime(150, now + 0.25);
+          gain.gain.setValueAtTime(vol, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+          osc.start(now); osc.stop(now + 0.26);
+        }
+      } catch (e) {}
+    }
+
+    let availableVoices = [];
+    if ("speechSynthesis" in window) {
+      const loadVoices = () => { availableVoices = window.speechSynthesis.getVoices(); };
+      loadVoices();
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function speakTelugu(text, btnEl = null) {
+      playChime("tap");
+      if (!("speechSynthesis" in window)) return;
+
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "te-IN";
+      utter.volume = 1.0;
+      utter.rate = 0.82; // Clear, child-friendly speed
+      utter.pitch = 1.1;
+
+      const teVoice = availableVoices.find(v => v.lang.toLowerCase().includes("te")) ||
+                      availableVoices.find(v => v.lang.toLowerCase().includes("hi")) ||
+                      availableVoices.find(v => v.lang.toLowerCase().includes("in"));
+      if (teVoice) utter.voice = teVoice;
+
+      if (btnEl) btnEl.classList.add("speaker-speaking");
+      utter.onend = () => {
+        if (btnEl) btnEl.classList.remove("speaker-speaking");
+      };
+      utter.onerror = () => {
+        if (btnEl) btnEl.classList.remove("speaker-speaking");
+      };
+
+      window.speechSynthesis.speak(utter);
+
+      // If Loud Boost is enabled, double-chime resonance for classroom clarity
+      if (state.loudBoost) {
+        setTimeout(() => playChime("tap"), 90);
+      }
+    }
+
+    function toggleLoudBoost() {
+      state.loudBoost = !state.loudBoost;
+      const btn = document.getElementById("boostBtn");
+      const lbl = document.getElementById("boostLabel");
+      if (state.loudBoost) {
+        btn.className = "bg-green-500 hover:bg-green-600 text-white font-bold px-2 py-1 rounded-lg text-xs flex items-center gap-1 border border-white shadow active:scale-95";
+        lbl.textContent = "LOUD";
+      } else {
+        btn.className = "bg-gray-600 hover:bg-gray-700 text-white font-bold px-2 py-1 rounded-lg text-xs flex items-center gap-1 border border-white shadow active:scale-95";
+        lbl.textContent = "MED";
+      }
+      speakTelugu("జేకబ్ గ్యాప్ స్కూల్, పాలడుగు");
+      saveState();
+    }
+
+    /*************************************************************************
+     * 1-HOUR PRACTICE TIMER & HUD
+     *************************************************************************/
+    setInterval(() => {
+      state.secondsElapsed++;
+      updateTimerUI();
+      if (state.secondsElapsed % 10 === 0) saveState();
+    }, 1000);
+
+    function formatMMSS(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    }
+
+    function updateTimerUI() {
+      const formatted = formatMMSS(state.secondsElapsed);
+      document.getElementById("timerDisplay").textContent = formatted;
+      const pct = Math.min(100, Math.round((state.secondsElapsed / 3600) * 100));
+      document.getElementById("hourProgressBar").style.width = `${Math.max(2, pct)}%`;
+    }
+
+    function updateHeaderHUD() {
+      document.getElementById("scoreDisplay").textContent = state.score;
+      const heardCount = Object.keys(state.wordsHeard).length;
+      document.getElementById("wordsHeardFooter").textContent = `${heardCount}/48 Words Heard`;
+    }
+
+    /*************************************************************************
+     * MODE 1: LEARN & LISTEN (16 VOWELS x 3 NEW WORDS)
+     *************************************************************************/
+    function renderVowelPills() {
+      const container = document.getElementById("vowelPills");
+      container.innerHTML = "";
+      ACCHULU_SET_2.forEach((item, idx) => {
+        const isCurrent = idx === state.currentVowelIdx;
+        const btn = document.createElement("button");
+        btn.className = `telugu-font w-8 h-8 sm:w-9 sm:h-9 rounded-xl font-black text-sm sm:text-base flex items-center justify-center shrink-0 transition shadow-sm ${
+          isCurrent
+            ? "bg-pink-600 text-white scale-110 ring-2 ring-yellow-300"
+            : "bg-indigo-50 text-indigo-900 hover:bg-indigo-100"
+        }`;
+        btn.textContent = item.vowel;
+        btn.onclick = () => selectVowel(idx);
+        container.appendChild(btn);
+      });
+    }
+
+    function selectVowel(idx) {
+      state.currentVowelIdx = idx;
+      renderVowelPills();
+      renderLearnCards();
+      const group = ACCHULU_SET_2[idx];
+      speakTelugu(`${group.vowel}`);
+    }
+
+    function prevVowel() {
+      const next = (state.currentVowelIdx - 1 + ACCHULU_SET_2.length) % ACCHULU_SET_2.length;
+      selectVowel(next);
+    }
+
+    function nextVowel() {
+      const next = (state.currentVowelIdx + 1) % ACCHULU_SET_2.length;
+      selectVowel(next);
+    }
+
+    function speakCurrentVowel() {
+      const group = ACCHULU_SET_2[state.currentVowelIdx];
+      speakTelugu(`${group.vowel}.. ${group.words[0].te}, ${group.words[1].te}, ${group.words[2].te}`);
+    }
+
+    function speakAllThreeWords() {
+      const group = ACCHULU_SET_2[state.currentVowelIdx];
+      const text = `${group.vowel} తో పదాలు: ${group.words.map(w => `${group.vowel} - ${w.te}`).join("... ")}`;
+      speakTelugu(text);
+    }
+
+    function highlightStartingVowel(word, vowel) {
+      if (word.startsWith(vowel)) {
+        const rest = word.slice(vowel.length);
+        return `<span class="text-rose-600 underline decoration-yellow-400">${vowel}</span><span>${rest}</span>`;
+      }
+      return word;
+    }
+
+    function renderLearnCards() {
+      const group = ACCHULU_SET_2[state.currentVowelIdx];
+      document.getElementById("activeVowelBadge").textContent = group.vowel;
+      document.getElementById("activeVowelTitle").textContent = `${group.vowel} - కొత్త పదాలు (Set 2)`;
+      document.getElementById("activeVowelPhonetic").textContent = `'${group.sound}' sound`;
+
+      const grid = document.getElementById("learnCardsGrid");
+      grid.innerHTML = "";
+
+      const cardBgColors = [
+        "from-yellow-50 to-orange-100",
+        "from-cyan-50 to-blue-100",
+        "from-pink-50 to-purple-100"
+      ];
+
+      group.words.forEach((w, wIdx) => {
+        const wordId = `${state.currentVowelIdx}-${wIdx}`;
+        const practiced = state.wordsHeard[wordId] || 0;
+
+        const card = document.createElement("div");
+        card.className = `word-card bg-gradient-to-b ${cardBgColors[wIdx]} rounded-2xl p-2.5 sm:p-3 shadow-md flex flex-col justify-between relative cursor-pointer`;
+        card.onclick = (e) => {
+          const spkBtn = card.querySelector(".speaker-btn");
+          handleWordPractice(group.vowel, w, wordId, spkBtn);
+        };
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="bg-white/90 text-indigo-900 font-black px-2.5 py-0.5 rounded-full text-xs border border-indigo-200 shadow-sm">
+              ${practiced > 0 ? `✅ ${practiced}x` : "🆕 New"}
+            </span>
+            <button class="speaker-btn" title="Listen Loudly">
+              <i class="fa-solid fa-volume-high text-base"></i>
+            </button>
+          </div>
+
+          <div class="flex flex-col items-center my-1">
+            <div class="text-5xl sm:text-6xl md:text-7xl drop-shadow transform transition hover:scale-110">${w.emoji}</div>
+            <div class="telugu-font font-black text-2xl sm:text-3xl text-indigo-950 mt-1 tracking-wide text-center">
+              ${highlightStartingVowel(w.te, group.vowel)}
+            </div>
+            <div class="text-xs sm:text-sm font-bold text-purple-800 bg-white/80 px-3 py-0.5 rounded-full mt-0.5 shadow-sm">
+              ${w.en} <span class="text-gray-500 font-normal">(${w.pron})</span>
+            </div>
+          </div>
+
+          <div class="bg-white/90 rounded-xl px-2.5 py-1.5 text-center border border-indigo-100">
+            <p class="telugu-font text-xs sm:text-sm font-bold text-gray-800">${w.sentence}</p>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function handleWordPractice(vowel, wordObj, wordId, btnEl) {
+      state.wordsHeard[wordId] = (state.wordsHeard[wordId] || 0) + 1;
+      state.vowelMastery[vowel] = (state.vowelMastery[vowel] || 0) + 2;
+      state.score += 5;
+      saveState();
+      renderLearnCards();
+      speakTelugu(`${vowel}.. ${wordObj.te}.. ${wordObj.sentence}`, btnEl);
+    }
+
+    /*************************************************************************
+     * MODE 2: MEMORY FLIP GAME
+     *************************************************************************/
+    let memCards = [];
+    let memFlipped = [];
+    let memMatchedCount = 0;
+    let memTotalPairs = 6;
+    let memLocked = false;
+
+    function initMemoryGame(totalCards = 12) {
+      memTotalPairs = totalCards / 2;
+      memMatchedCount = 0;
+      memFlipped = [];
+      memLocked = false;
+      document.getElementById("memPairsCount").textContent = `0/${memTotalPairs}`;
+
+      const shuffled = [...ALL_WORDS].sort(() => Math.random() - 0.5).slice(0, memTotalPairs);
+      const deck = [];
+
+      shuffled.forEach((item, idx) => {
+        // Card A: Vowel + Emoji
+        deck.push({
+          pairId: idx,
+          type: "vowel",
+          displayMain: item.vowel,
+          displaySub: item.emoji,
+          speech: `${item.vowel}`,
+          vowel: item.vowel
+        });
+        // Card B: Word + Meaning
+        deck.push({
+          pairId: idx,
+          type: "word",
+          displayMain: item.te,
+          displaySub: `${item.emoji} ${item.en}`,
+          speech: `${item.te}`,
+          vowel: item.vowel
+        });
+      });
+
+      memCards = deck.sort(() => Math.random() - 0.5);
+      const board = document.getElementById("memoryBoard");
+      board.className = `flex-1 grid ${totalCards <= 6 ? 'grid-cols-3' : 'grid-cols-4'} gap-2 p-1 overflow-hidden`;
+      board.innerHTML = "";
+
+      memCards.forEach((card, i) => {
+        const el = document.createElement("div");
+        el.className = "mem-card w-full h-full";
+        el.innerHTML = `
+          <div class="mem-inner">
+            <div class="mem-front">
+              <span class="text-2xl sm:text-3xl">🌟</span>
+              <span class="text-[10px] font-bold tracking-wider mt-0.5">TAP</span>
+            </div>
+            <div class="mem-back p-1">
+              <div class="telugu-font font-black text-lg sm:text-2xl text-indigo-950 leading-tight">${card.displayMain}</div>
+              <div class="text-xs sm:text-sm font-bold text-pink-600 mt-0.5">${card.displaySub}</div>
+            </div>
+          </div>
+        `;
+        el.onclick = () => flipMemCard(i, el);
+        board.appendChild(el);
+      });
+    }
+
+    function flipMemCard(index, el) {
+      if (memLocked) return;
+      if (el.classList.contains("flipped") || el.classList.contains("matched")) return;
+
+      const cardData = memCards[index];
+      el.classList.add("flipped");
+      speakTelugu(cardData.speech);
+      memFlipped.push({ index, el, cardData });
+
+      if (memFlipped.length === 2) {
+        memLocked = true;
+        const [first, second] = memFlipped;
+        if (first.cardData.pairId === second.cardData.pairId) {
+          setTimeout(() => {
+            first.el.classList.add("matched");
+            second.el.classList.add("matched");
+            playChime("success");
+            memMatchedCount++;
+            state.score += 15;
+            state.vowelMastery[first.cardData.vowel] = (state.vowelMastery[first.cardData.vowel] || 0) + 4;
+            document.getElementById("memPairsCount").textContent = `${memMatchedCount}/${memTotalPairs}`;
+            memFlipped = [];
+            memLocked = false;
+            saveState();
+
+            if (memMatchedCount === memTotalPairs) {
+              state.gamesCompleted++;
+              state.score += 30;
+              saveState();
+              speakTelugu("శభాష్! అన్ని జతలు సరిగ్గా కలిపారు!");
+            }
+          }, 450);
+        } else {
+          setTimeout(() => {
+            playChime("wrong");
+            first.el.classList.remove("flipped");
+            second.el.classList.remove("flipped");
+            memFlipped = [];
+            memLocked = false;
+          }, 850);
+        }
+      }
+    }
+
+    /*************************************************************************
+     * MODE 3: MATCH THE FOLLOWING
+     *************************************************************************/
+    let matchItems = [];
+    let selectedLeftIdx = null;
+    let matchedPairsInRound = 0;
+
+    function initMatchGame() {
+      selectedLeftIdx = null;
+      matchedPairsInRound = 0;
+      document.getElementById("matchRoundNum").textContent = state.matchRound;
+
+      // Pick 4 distinct vowels
+      const pool = [...ALL_WORDS].sort(() => Math.random() - 0.5);
+      const chosen = [];
+      const usedVowels = new Set();
+      for (const w of pool) {
+        if (!usedVowels.has(w.vowel) && chosen.length < 4) {
+          usedVowels.add(w.vowel);
+          chosen.push(w);
+        }
+      }
+
+      matchItems = chosen;
+      const rightShuffled = [...chosen].sort(() => Math.random() - 0.5);
+
+      const leftCol = document.getElementById("matchLeftCol");
+      const rightCol = document.getElementById("matchRightCol");
+      leftCol.innerHTML = "";
+      rightCol.innerHTML = "";
+
+      chosen.forEach((item, idx) => {
+        const btn = document.createElement("div");
+        btn.id = `match-left-${idx}`;
+        btn.className = "flex-1 bg-white rounded-2xl px-3 py-1.5 shadow border-2 border-indigo-200 flex items-center justify-between cursor-pointer transition";
+        btn.onclick = () => selectMatchLeft(idx, item);
+        btn.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-indigo-600 text-white font-black text-lg sm:text-2xl flex items-center justify-center telugu-font">${item.vowel}</span>
+            <span class="text-2xl sm:text-3xl">${item.emoji}</span>
+          </div>
+          <button onclick="event.stopPropagation(); speakTelugu('${item.vowel} - ${item.te}', this)" class="speaker-btn !w-9 !h-9">
+            <i class="fa-solid fa-volume-high text-xs"></i>
+          </button>
+        `;
+        leftCol.appendChild(btn);
+      });
+
+      rightShuffled.forEach((item, rIdx) => {
+        const btn = document.createElement("div");
+        btn.id = `match-right-${rIdx}`;
+        btn.dataset.wordId = item.id;
+        btn.className = "flex-1 bg-white rounded-2xl px-3 py-1.5 shadow border-2 border-pink-200 flex items-center justify-between cursor-pointer transition";
+        btn.onclick = () => selectMatchRight(rIdx, item, btn);
+        btn.innerHTML = `
+          <div>
+            <div class="telugu-font font-black text-lg sm:text-2xl text-indigo-950">${item.te}</div>
+            <div class="text-[11px] font-bold text-gray-500">${item.en}</div>
+          </div>
+          <button onclick="event.stopPropagation(); speakTelugu('${item.te}', this)" class="speaker-btn !w-9 !h-9">
+            <i class="fa-solid fa-volume-high text-xs"></i>
+          </button>
+        `;
+        rightCol.appendChild(btn);
+      });
+    }
+
+    function selectMatchLeft(idx, item) {
+      const el = document.getElementById(`match-left-${idx}`);
+      if (el.classList.contains("opacity-40")) return;
+
+      document.querySelectorAll("[id^='match-left-']").forEach(b => b.classList.remove("ring-4", "ring-yellow-400", "bg-yellow-50"));
+      el.classList.add("ring-4", "ring-yellow-400", "bg-yellow-50");
+      selectedLeftIdx = idx;
+      speakTelugu(item.vowel);
+    }
+
+    function selectMatchRight(rIdx, rightItem, rightEl) {
+      if (rightEl.classList.contains("opacity-40")) return;
+      if (selectedLeftIdx === null) {
+        speakTelugu(rightItem.te);
+        return;
+      }
+
+      const leftItem = matchItems[selectedLeftIdx];
+      const leftEl = document.getElementById(`match-left-${selectedLeftIdx}`);
+
+      if (leftItem.id === rightItem.id) {
+        playChime("success");
+        speakTelugu(`${leftItem.vowel} - ${rightItem.te}`);
+        leftEl.className = "flex-1 bg-green-100 rounded-2xl px-3 py-1.5 border-2 border-green-500 flex items-center justify-between opacity-40 pointer-events-none";
+        rightEl.className = "flex-1 bg-green-100 rounded-2xl px-3 py-1.5 border-2 border-green-500 flex items-center justify-between opacity-40 pointer-events-none";
+        selectedLeftIdx = null;
+        matchedPairsInRound++;
+        state.score += 10;
+        state.vowelMastery[leftItem.vowel] = (state.vowelMastery[leftItem.vowel] || 0) + 3;
+        saveState();
+
+        if (matchedPairsInRound === 4) {
+          state.matchRound++;
+          state.gamesCompleted++;
+          saveState();
+          setTimeout(() => initMatchGame(), 900);
+        }
+      } else {
+        playChime("wrong");
+        rightEl.classList.add("bg-red-100", "border-red-500");
+        setTimeout(() => rightEl.classList.remove("bg-red-100", "border-red-500"), 500);
+      }
+    }
+
+    /*************************************************************************
+     * MODE 4: CHOOSE THE CORRECT WORD QUIZ
+     *************************************************************************/
+    let currentQuizWord = null;
+    let quizAnswered = false;
+
+    function nextQuizQuestion() {
+      quizAnswered = false;
+      currentQuizWord = ALL_WORDS[Math.floor(Math.random() * ALL_WORDS.length)];
+      document.getElementById("quizQNum").textContent = state.quizTotal + 1;
+      document.getElementById("quizStreak").textContent = state.quizStreak;
+      document.getElementById("quizVowelHint").textContent = `అచ్చు: ${currentQuizWord.vowel}`;
+      document.getElementById("quizEmoji").textContent = currentQuizWord.emoji;
+      document.getElementById("quizEngHint").textContent = currentQuizWord.en;
+      document.getElementById("quizFeedbackBar").textContent = "👆 చిత్రానికి సరిపోయే తెలుగు పదాన్ని ఎంచుకోండి!";
+      document.getElementById("quizFeedbackBar").className = "bg-white/90 rounded-xl px-3 py-1.5 text-center font-extrabold text-xs sm:text-sm text-indigo-900 shadow shrink-0 border border-indigo-100";
+
+      // Generate 3 distractors
+      const distractors = ALL_WORDS.filter(w => w.id !== currentQuizWord.id)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3);
+      const options = [currentQuizWord, ...distractors].sort(() => Math.random() - 0.5);
+
+      const grid = document.getElementById("quizOptionsGrid");
+      grid.innerHTML = "";
+
+      options.forEach(opt => {
+        const card = document.createElement("div");
+        card.className = "bg-white hover:bg-indigo-50 rounded-2xl p-2.5 shadow-md border-2 border-indigo-200 flex items-center justify-between cursor-pointer transition active:scale-95";
+        card.onclick = () => checkQuizAnswer(opt, card);
+        card.innerHTML = `
+          <div>
+            <div class="telugu-font font-black text-xl sm:text-2xl text-indigo-950">${opt.te}</div>
+            <div class="text-xs font-semibold text-gray-500">${opt.pron}</div>
+          </div>
+          <button onclick="event.stopPropagation(); speakTelugu('${opt.te}', this)" class="speaker-btn !w-10 !h-10" title="Listen Option">
+            <i class="fa-solid fa-volume-high text-sm"></i>
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function speakQuizPrompt() {
+      if (!currentQuizWord) return;
+      speakTelugu(`${currentQuizWord.vowel} తో మొదలయ్యే పదం.. ${currentQuizWord.te}`);
+    }
+
+    function checkQuizAnswer(selected, cardEl) {
+      if (quizAnswered) return;
+      state.quizTotal++;
+
+      if (selected.id === currentQuizWord.id) {
+        quizAnswered = true;
+        state.quizCorrect++;
+        state.quizStreak++;
+        state.score += 15;
+        state.vowelMastery[currentQuizWord.vowel] = (state.vowelMastery[currentQuizWord.vowel] || 0) + 5;
+        playChime("success");
+        speakTelugu(`శభాష్! ${currentQuizWord.te} సరైన సమాధానం!`);
+
+        cardEl.className = "bg-green-500 text-white rounded-2xl p-2.5 shadow-lg border-2 border-white flex items-center justify-between scale-102";
+        const fb = document.getElementById("quizFeedbackBar");
+        fb.textContent = `🎉 అద్భుతం! ${currentQuizWord.vowel} - ${currentQuizWord.te} (${currentQuizWord.en}) సరైన సమాధానం!`;
+        fb.className = "bg-green-600 text-white rounded-xl px-3 py-1.5 text-center font-extrabold text-xs sm:text-sm shadow shrink-0";
+
+        saveState();
+        setTimeout(() => nextQuizQuestion(), 1400);
+      } else {
+        state.quizStreak = 0;
+        playChime("wrong");
+        speakTelugu(`మళ్ళీ ప్రయత్నించండి`);
+        cardEl.className = "bg-red-100 border-2 border-red-500 rounded-2xl p-2.5 flex items-center justify-between opacity-60";
+        const fb = document.getElementById("quizFeedbackBar");
+        fb.textContent = `❌ అది '${selected.te}'. మళ్ళీ వింటూ సరైన పదం ఎంచుకోండి!`;
+        fb.className = "bg-red-600 text-white rounded-xl px-3 py-1.5 text-center font-extrabold text-xs sm:text-sm shadow shrink-0";
+        saveState();
+      }
+    }
+
+    /*************************************************************************
+     * MODE 5: PROGRESS REPORT & HOW WELL THEY HAVE DONE
+     *************************************************************************/
+    function saveStudentName(val) {
+      state.studentName = val;
+      saveState();
+    }
+
+    function renderReport() {
+      document.getElementById("studentNameInput").value = state.studentName || "";
+      document.getElementById("repTime").textContent = formatMMSS(state.secondsElapsed);
+      const minPct = Math.min(100, Math.round((state.secondsElapsed / 3600) * 100));
+      document.getElementById("repGoalPct").textContent = `${minPct}% of 60m Goal`;
+
+      const heardCount = Object.keys(state.wordsHeard).length;
+      document.getElementById("repWordsCount").textContent = `${heardCount} / 48`;
+
+      const acc = state.quizTotal > 0 ? Math.round((state.quizCorrect / state.quizTotal) * 100) : 100;
+      document.getElementById("repAccuracy").textContent = `${acc}%`;
+      document.getElementById("repQuizDetail").textContent = `${state.quizCorrect} Correct / ${state.quizTotal} Attempts`;
+
+      document.getElementById("repStars").textContent = `⭐ ${state.score}`;
+      document.getElementById("repGamesWon").textContent = `${state.gamesCompleted} Games Won`;
+
+      let gradeText = "🌟 బాగా సాధన చేస్తున్నారు! (Good Effort - Keep Going!)";
+      if (heardCount >= 35 || state.score >= 300) {
+        gradeText = "🏆 అద్భుతమైన ప్రతిభ! (Outstanding Telugu Acchulu Master!)";
+      } else if (heardCount >= 18 || state.score >= 150) {
+        gradeText = "👏 చాలా బాగా నేర్చుకున్నారు! (Very Good Progress!)";
+      }
+      document.getElementById("repGradeTitle").textContent = gradeText;
+
+      const grid = document.getElementById("vowelMasteryGrid");
+      grid.innerHTML = "";
+      ACCHULU_SET_2.forEach(g => {
+        const pts = state.vowelMastery[g.vowel] || 0;
+        const badgeColor = pts >= 10
+          ? "bg-green-100 border-green-500 text-green-900"
+          : pts > 0
+          ? "bg-yellow-100 border-yellow-500 text-yellow-900"
+          : "bg-gray-100 border-gray-300 text-gray-600";
+
+        const cell = document.createElement("div");
+        cell.className = `rounded-xl p-1.5 border-2 text-center cursor-pointer ${badgeColor}`;
+        cell.onclick = () => speakTelugu(`${g.vowel}`);
+        cell.innerHTML = `
+          <div class="telugu-font font-black text-base sm:text-lg">${g.vowel}</div>
+          <div class="text-[10px] font-bold">${pts >= 10 ? "⭐ Mastered" : pts > 0 ? `${pts} pts` : "Practice"}</div>
+        `;
+        grid.appendChild(cell);
+      });
+    }
+
+    function speakReportSummary() {
+      const heardCount = Object.keys(state.wordsHeard).length;
+      const mins = Math.max(1, Math.floor(state.secondsElapsed / 60));
+      speakTelugu(`జేకబ్ గ్యాప్ స్కూల్, పాలడుగు. మీరు ${mins} నిమిషాలు సాధన చేసి, ${heardCount} తెలుగు పదాలు నేర్చుకున్నారు మరియు ${state.score} పాయింట్లు సాధించారు. శభాష్!`);
+    }
+
+    /*************************************************************************
+     * TAB NAVIGATION
+     *************************************************************************/
+    function switchMode(mode) {
+      ["learn", "memory", "match", "quiz", "report"].forEach(m => {
+        document.getElementById(`mode-${m}`).classList.add("hidden");
+        const tab = document.getElementById(`tab-${m}`);
+        tab.className = "mode-tab flex-1 py-1 px-1 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1 bg-purple-100 text-purple-900";
+      });
+
+      document.getElementById(`mode-${mode}`).classList.remove("hidden");
+      const activeTab = document.getElementById(`tab-${mode}`);
+      activeTab.className = "mode-tab flex-1 py-1 px-1 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1 bg-pink-600 text-white shadow";
+
+      if (mode === "memory" && memCards.length === 0) initMemoryGame(12);
+      if (mode === "match" && matchItems.length === 0) initMatchGame();
+      if (mode === "quiz" && !currentQuizWord) nextQuizQuestion();
+      if (mode === "report") renderReport();
+    }
+
+    // Initialize Application
+    window.addEventListener("DOMContentLoaded", () => {
+      renderVowelPills();
+      renderLearnCards();
+      updateTimerUI();
+      updateHeaderHUD();
+    });
+  </script>
+</body>
+</html>
